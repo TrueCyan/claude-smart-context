@@ -8,6 +8,25 @@ Smart context management plugin for Claude Code.
 - **Progressive Summarization**: Continuously saves context to external files
 - **Auto Context Switching**: Detects task changes and manages transitions
 - **Archive Access**: Instantly load previous work context
+- **Cross-Platform**: Works on Windows, macOS, and Linux
+
+## Requirements
+
+- **Python 3.8+** (automatically sets up virtual environment on first run)
+
+## Installation
+
+```bash
+# Add marketplace (once)
+/plugin marketplace add TrueCyan/claude-plugins
+
+# Install plugin
+/plugin install claude-smart-context@truecyan-plugins
+```
+
+On first session start, the plugin automatically:
+1. Creates a Python virtual environment
+2. Sets up context history directories
 
 ## How It Works
 
@@ -30,21 +49,6 @@ Smart context management plugin for Claude Code.
 [Next Prompt] → Auto-restore context from file
 ```
 
-## Installation
-
-### Option 1: Direct Install
-
-```bash
-/plugin install TrueCyan/claude-smart-context
-```
-
-### Option 2: Via Marketplace
-
-```bash
-/plugin marketplace add TrueCyan/claude-smart-context
-/plugin install claude-smart-context
-```
-
 ## Usage
 
 Once installed, the plugin works automatically:
@@ -54,10 +58,10 @@ Once installed, the plugin works automatically:
 3. **Fast Compact**: When context is full, uses `/clear` instead of `/compact`
 4. **Archive Access**: Ask about previous work to load from archives
 
-### Commands (via Claude)
+### Manual Commands
 
 ```bash
-# Archive current context and switch
+# Archive current context and switch task
 python3 ~/.claude/scripts/archive_current.py "Task Title" "keyword1,keyword2"
 /clear
 
@@ -98,7 +102,7 @@ Completed login/logout API. Working on token refresh.
 - Add tests
 ```
 
-## Why This Plugin?
+## Comparison
 
 | Standard Compact | Smart Context |
 |-----------------|---------------|
@@ -106,11 +110,6 @@ Completed login/logout API. Working on token refresh.
 | Context loss risk | Explicit saves |
 | No history | Archive access |
 | Manual only | Auto-detection |
-
-## Requirements
-
-- Claude Code CLI
-- Python 3.7+
 
 ## License
 

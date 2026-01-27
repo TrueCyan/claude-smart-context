@@ -88,15 +88,26 @@ Analyze the user's request:
    → Execute: `/clear`
 </context-check>""")
     else:
-        # No current context
-        if archive_list:
-            print(f"""<context-info>
+        # No current context - always show message
+        print(f"""<context-info>
 No active context. Starting fresh.
 
 ## Previous Archives
-{archive_list}
+{archive_list if archive_list else "(none)"}
 
-If you need previous context, ask about it.
+Save your work progress with:
+```bash
+cat > ~/.claude/context_history/current_context.md << 'EOF'
+## Current Task
+[Task title]
+
+## Summary
+[Progress]
+
+## Files Modified
+- [files]
+EOF
+```
 </context-info>""")
 
 
