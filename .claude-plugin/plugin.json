@@ -1,7 +1,7 @@
 {
   "name": "claude-smart-context",
   "description": "Smart context management for Claude Code - Fast compaction with auto-archiving and context switching detection",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": {
     "name": "TrueCyan"
   },

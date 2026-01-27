@@ -10,9 +10,8 @@
         ]
       }
     ],
-    "Notification": [
+    "UserPromptSubmit": [
       {
-        "matcher": "prompt_submit",
         "hooks": [
           {
             "type": "command",
