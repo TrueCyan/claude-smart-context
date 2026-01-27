@@ -1,0 +1,11 @@
+{
+  "name": "claude-smart-context",
+  "description": "Smart context management for Claude Code - Fast compaction with auto-archiving and context switching detection",
+  "version": "1.0.0",
+  "author": {
+    "name": "TrueCyan"
+  },
+  "homepage": "https://github.com/TrueCyan/claude-smart-context",
+  "repository": "https://github.com/TrueCyan/claude-smart-context",
+  "license": "MIT"
+}

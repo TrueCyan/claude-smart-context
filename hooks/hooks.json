@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "prompt_submit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context_manager.py"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/fast_compact.py"
+          }
+        ]
+      }
+    ]
+  }
+}
