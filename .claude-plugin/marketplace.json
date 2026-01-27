@@ -1,0 +1,14 @@
+{
+  "name": "smart-context-marketplace",
+  "owner": {
+    "name": "TrueCyan"
+  },
+  "plugins": [
+    {
+      "name": "claude-smart-context",
+      "source": ".",
+      "description": "Smart context management for Claude Code - Fast compaction with auto-archiving",
+      "version": "1.0.0"
+    }
+  ]
+}
