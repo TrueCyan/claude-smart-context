@@ -20,6 +20,7 @@ CURRENT = CONTEXT_DIR / "current_context.md"
 ARCHIVE_DIR = CONTEXT_DIR / "archives"
 CLEAR_FLAG = CONTEXT_DIR / ".clear_flag"
 LAST_SESSION_FILE = CONTEXT_DIR / ".last_session_id"
+GAP_LOG = CONTEXT_DIR / ".gap_log"
 
 # Ensure directories exist
 CONTEXT_DIR.mkdir(parents=True, exist_ok=True)
@@ -123,6 +124,9 @@ def main():
     # Case 1: Post /clear - restore context
     if CLEAR_FLAG.exists():
         CLEAR_FLAG.unlink()
+        # Clear gap log on restore (gap was already archived by fast_compact)
+        if GAP_LOG.exists():
+            GAP_LOG.write_text("", encoding='utf-8')
         if CURRENT.exists():
             summary = CURRENT.read_text(encoding='utf-8').strip()
             if summary:
