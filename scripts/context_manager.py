@@ -25,8 +25,19 @@ LAST_SESSION_FILE = CONTEXT_DIR / ".last_session_id"
 CONTEXT_DIR.mkdir(parents=True, exist_ok=True)
 ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
 
-# Agent invocation instruction injected into every prompt
-AGENT_INSTRUCTION = """<context-rules>
+def build_agent_instruction(current_task: str = "") -> str:
+    """Build context-rules instruction with optional current task for comparison."""
+    if current_task:
+        return f"""<context-rules>
+Current task: {current_task}
+
+Before starting work, compare the user's request to the current task above.
+- If the request is about a DIFFERENT task: call context-manager agent to archive, then /clear, then start the new task.
+- If the request is the SAME or a continuation: proceed normally.
+After completing meaningful work, call context-manager agent to update the context summary.
+</context-rules>"""
+    else:
+        return """<context-rules>
 After completing meaningful work (task completion, file modifications, key decisions),
 call the context-manager agent to update the context summary.
 </context-rules>"""
@@ -108,6 +119,8 @@ def main():
         if CURRENT.exists():
             summary = CURRENT.read_text(encoding='utf-8').strip()
             if summary:
+                task_match = re.search(r'^## Current Task\s*\n(.+)', summary, re.MULTILINE)
+                restored_task = task_match.group(1).strip() if task_match else ""
                 print(f"""<context-restored>
 {summary}
 
@@ -115,7 +128,7 @@ def main():
 Above context has been restored. Continue your work with this context.
 </context-restored>
 
-{AGENT_INSTRUCTION}""")
+{build_agent_instruction(restored_task)}""")
                 return
 
     # Detect session change
@@ -138,6 +151,15 @@ Above context has been restored. Continue your work with this context.
     archives = get_archives(5)
     archive_list = "\n".join([f"- **{a['title']}** ({a['file']})" for a in archives])
 
+    # Extract current task title for context-switch detection
+    current_task = ""
+    if current:
+        task_match = re.search(r'^## Current Task\s*\n(.+)', current, re.MULTILINE)
+        if task_match:
+            current_task = task_match.group(1).strip()
+
+    instruction = build_agent_instruction(current_task)
+
     if session_changed:
         # New session - previous context was archived
         print(f"""<context-info>
@@ -149,7 +171,7 @@ New session detected. Previous context has been archived.
 To access previous work, use the context-manager agent to search archives.
 </context-info>
 
-{AGENT_INSTRUCTION}""")
+{instruction}""")
     elif current:
         print(f"""<context-check>
 ## Current Context
@@ -159,7 +181,7 @@ To access previous work, use the context-manager agent to search archives.
 {archive_list if archive_list else "(none)"}
 </context-check>
 
-{AGENT_INSTRUCTION}""")
+{instruction}""")
     else:
         # No current context, fresh start
         print(f"""<context-info>
@@ -169,7 +191,7 @@ No active context. Starting fresh.
 {archive_list if archive_list else "(none)"}
 </context-info>
 
-{AGENT_INSTRUCTION}""")
+{instruction}""")
 
 
 if __name__ == "__main__":
