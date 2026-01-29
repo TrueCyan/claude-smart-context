@@ -25,15 +25,22 @@ LAST_SESSION_FILE = CONTEXT_DIR / ".last_session_id"
 CONTEXT_DIR.mkdir(parents=True, exist_ok=True)
 ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
 
-def build_agent_instruction(current_task: str = "") -> str:
-    """Build context-rules instruction with optional current task for comparison."""
-    if current_task:
-        return f"""<context-rules>
-Current task: {current_task}
+def build_agent_instruction(current_task: str = "", archive_titles: list = None) -> str:
+    """Build context-rules instruction with current task and archive titles for comparison."""
+    archive_section = ""
+    if archive_titles:
+        titles = ", ".join(archive_titles)
+        archive_section = f"\nPrevious tasks: {titles}\n"
 
-Before starting work, compare the user's request to the current task above.
-- If the request is about a DIFFERENT task: call context-manager agent to archive, then /clear, then start the new task.
-- If the request is the SAME or a continuation: proceed normally.
+    if current_task or archive_titles:
+        current_line = f"Current task: {current_task}" if current_task else "Current task: (none)"
+        return f"""<context-rules>
+{current_line}
+{archive_section}
+Before starting work, compare the user's request to the context above.
+1. SAME as current task → proceed normally.
+2. Matches a PREVIOUS task → call context-manager agent to archive current context, load the matching archive, then /clear to restore it.
+3. COMPLETELY NEW task → call context-manager agent to archive current context, then /clear, then start fresh.
 After completing meaningful work, call context-manager agent to update the context summary.
 </context-rules>"""
     else:
@@ -121,6 +128,8 @@ def main():
             if summary:
                 task_match = re.search(r'^## Current Task\s*\n(.+)', summary, re.MULTILINE)
                 restored_task = task_match.group(1).strip() if task_match else ""
+                archives = get_archives(5)
+                restored_archive_titles = [a['title'] for a in archives]
                 print(f"""<context-restored>
 {summary}
 
@@ -128,7 +137,7 @@ def main():
 Above context has been restored. Continue your work with this context.
 </context-restored>
 
-{build_agent_instruction(restored_task)}""")
+{build_agent_instruction(restored_task, restored_archive_titles)}""")
                 return
 
     # Detect session change
@@ -158,7 +167,8 @@ Above context has been restored. Continue your work with this context.
         if task_match:
             current_task = task_match.group(1).strip()
 
-    instruction = build_agent_instruction(current_task)
+    archive_titles = [a['title'] for a in archives]
+    instruction = build_agent_instruction(current_task, archive_titles)
 
     if session_changed:
         # New session - previous context was archived

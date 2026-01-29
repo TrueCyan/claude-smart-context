@@ -26,30 +26,28 @@ You do NOT need to manually write context files. The agent handles everything.
 
 ## Context Switch Detection
 
-When `<context-rules>` includes a `Current task:` line, compare it to the user's new request:
+When `<context-rules>` includes `Current task:` and `Previous tasks:`, compare the user's request:
 
-**Same context** (proceed normally):
+### 1. Same as current task → Proceed normally
 - Same project, same feature, same bug
 - Follow-up questions about current work
 - "commit this", "test this", "push" etc.
 
-**Different context** (switch required):
-- Completely different project or codebase
-- Unrelated feature or topic
-- Different technology domain (e.g., was doing Unity C#, now asking about Python plugin)
+### 2. Matches a previous task → Restore from archive
+- User mentions work from a previous task listed in `Previous tasks:`
+- e.g., "이전에 했던 API 작업 이어서 해줘", "그 Unity 빌드 설정 다시 보자"
+- **Action:**
+  1. Call context-manager agent to archive current context
+  2. Call context-manager agent to load the matching archive
+  3. Execute `/clear` to restore with the loaded context
 
-**When switching context:**
-1. Call context-manager agent to archive current context
-2. Execute `/clear` to free up the context window
-3. Begin the new task fresh
-
-## Context Switching (Manual)
-
-When `<context-check>` message is received without automatic detection:
-
-1. **Same context** - Continue working normally
-2. **Question about previous work** - Call context-manager agent to search archives
-3. **New/different task** - Call context-manager agent to archive current context, then `/clear`
+### 3. Completely new task → Archive and start fresh
+- Unrelated project, feature, or technology domain
+- Nothing matching in current or previous tasks
+- **Action:**
+  1. Call context-manager agent to archive current context
+  2. Execute `/clear`
+  3. Begin the new task fresh
 
 ## After /clear
 
