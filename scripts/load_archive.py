@@ -8,6 +8,10 @@ Usage: python3 load_archive.py "search term"
 import sys
 from pathlib import Path
 
+# Force UTF-8 encoding for stdin/stdout (Windows compatibility)
+sys.stdin.reconfigure(encoding='utf-8', errors='replace')
+sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+
 ARCHIVE_DIR = Path.home() / ".claude" / "context_history" / "archives"
 
 query = " ".join(sys.argv[1:]).lower() if len(sys.argv) > 1 else ""

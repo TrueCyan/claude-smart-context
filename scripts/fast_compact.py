@@ -7,6 +7,10 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
+# Force UTF-8 encoding for stdin/stdout (Windows compatibility)
+sys.stdin.reconfigure(encoding='utf-8', errors='replace')
+sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+
 CONTEXT_DIR = Path.home() / ".claude" / "context_history"
 CURRENT = CONTEXT_DIR / "current_context.md"
 ARCHIVE_DIR = CONTEXT_DIR / "archives"
